@@ -1,0 +1,25 @@
+services:
+  nats-server:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    networks:
+      - nats-network
+    volumes:
+      - ./nats-server.conf:/etc/nats/nats-server.conf
+    command: ["-c", "/etc/nats/nats-server.conf"]
+
+  nats-client:
+    image: natsio/nats-box:latest
+    depends_on:
+      - nats-server
+    networks:
+      - nats-network
+    volumes:
+      - ./stream-config.json:/etc/nats/stream-config.json
+    command: /bin/sh -c "while true; do sleep 30; done;" # Keeps the client running
+
+networks:
+  nats-network:
+    driver: bridge
